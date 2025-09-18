@@ -2,8 +2,9 @@ const express = require('express');
 const fs = require('fs').promises;
 const path = require('path');
 const { mean } = require('../utils/stats');
-const router = express.Router();
-const DATA_PATH = path.join(__dirname, '../../data/items.json');
+const { writeFileSync } = require('fs');
+const statsRouter = express.Router();
+const DATA_PATH = path.join(__dirname, '../../../data/items.json');
 
 // cache to hold the stats
 let cache = {
@@ -15,11 +16,13 @@ async function computeStats() {
   const raw = await fs.readFile(DATA_PATH, 'utf8');
   const items = JSON.parse(raw);
 
+  await fs.appendFile('log.txt', `items: ${JSON.stringify(items)}`)
+
   // calculate the stats
   const stats = {
     total: items.length,
     averagePrice: items.length
-      ? mean(items)
+      ? mean(items.map((item) => item.price))
       : 0
   };
 
@@ -31,13 +34,21 @@ async function computeStats() {
 
 async function getStats() {
   if (cache.stats) {
+    await fs.appendFile('log.txt', 'Returning stats from cache\n')
     return cache.stats;
   }
+
+  await fs.appendFile('log.txt', 'Computing stats\n')
   return computeStats();
 }
 
+function invalidateStatsCache() {
+ cache.stats = null;
+ cache.lastUpdated = null;
+}
+
 // GET /api/stats
-router.get('/', async (req, res, next) => {
+statsRouter.get('/', async (req, res, next) => {
   try {
     const stats = await getStats();
     res.json(stats);
@@ -46,4 +57,4 @@ router.get('/', async (req, res, next) => {
   }
 });
 
-module.exports = router;
+module.exports = { statsRouter, invalidateStatsCache };

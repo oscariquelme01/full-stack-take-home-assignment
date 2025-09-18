@@ -1,4 +1,4 @@
-### BACKEND
+## BACKEND
 
 1. **Refactor blocking I/O**  
    - `src/routes/items.js` uses `fs.readFileSync`. Replace with non‑blocking async operations.
@@ -67,3 +67,20 @@
    module.exports = { router, invalidateStatsCache }
    ```
 
+3. **Testing**  
+   - Add **unit tests** (Jest) for items routes (happy path + error cases).
+
+   The tests are written using `Jest` and `SuperTest`. I will admit that the boiler plate was written by AI. However, this are the list of test I would write myself:
+   - It should return correct stats
+   - It should use cached stats on subsequent calls
+   - It should recompute stats after cache invalidation
+
+   Test are run with `npm test` inside the backend directory
+
+
+#### Limitations and final thoughts on the backend
+- The test suite is comprehensible but more cases could be added
+- I didn't implement file watching as I feel like invalidating a cache from other endpoints sounds like a better, more realistic idea
+- Time based cache invalidation could be implemented
+
+## FRONTEND
