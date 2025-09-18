@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import './ItemDetail.css';
 
 function ItemDetail() {
   const { id } = useParams();
@@ -7,19 +8,23 @@ function ItemDetail() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('/api/items/' + id)
+    fetch('http://localhost:3001/api/items/' + id)
       .then(res => res.ok ? res.json() : Promise.reject(res))
       .then(setItem)
-      .catch(() => navigate('/'));
+      .catch((err) => {
+        console.error('Failed to fetch item:', err);
+        navigate('/');
+      });
   }, [id, navigate]);
 
   if (!item) return <p>Loading...</p>;
 
   return (
-    <div style={{padding: 16}}>
+    <div className="item-detail-container">
       <h2>{item.name}</h2>
       <p><strong>Category:</strong> {item.category}</p>
       <p><strong>Price:</strong> ${item.price}</p>
+      <Link to="/" className="back-button">Back to Items</Link>
     </div>
   );
 }

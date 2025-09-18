@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useData } from '../state/DataContext';
 import { Link } from 'react-router-dom';
-import '../globals.css';
+import './Items.css';
 
 function Items() {
   const { items, setItems, fetchItems } = useData();
